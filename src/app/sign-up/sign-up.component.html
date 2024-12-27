@@ -1,0 +1,97 @@
+<div class="sign-up-container">
+  <h2>Sign Up</h2>
+  <form [formGroup]="signUpForm">
+    <div class="form-group">
+      <label for="mobileNumber">Mobile Number:</label>
+      <input
+        type="tel"
+        id="mobileNumber"
+        formControlName="mobileNumber"
+        placeholder="Enter 10-digit mobile number"
+        [maxlength]="10"
+        [disabled]="isGeneratingOTP || isVerifyingOTP"
+      />
+      <div
+        class="error-message"
+        *ngIf="
+          signUpForm.get('mobileNumber')?.invalid &&
+          signUpForm.get('mobileNumber')?.touched
+        "
+      >
+        <span *ngIf="signUpForm.get('mobileNumber')?.errors?.['required']">
+          Mobile number is required
+        </span>
+        <span *ngIf="signUpForm.get('mobileNumber')?.errors?.['pattern']">
+          Please enter a valid 10-digit mobile number
+        </span>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="generateOTP()"
+      [disabled]="
+        signUpForm.get('mobileNumber')?.invalid ||
+        isGeneratingOTP ||
+        isVerifyingOTP
+      "
+      class="primary-button"
+    >
+      {{
+        isGeneratingOTP
+          ? "Generating OTP..."
+          : otpSent
+          ? "Resend OTP"
+          : "Generate OTP"
+      }}
+    </button>
+
+    <div *ngIf="otpSent" class="otp-section">
+      <label for="otp">Enter OTP:</label>
+      <input
+        type="text"
+        id="otp"
+        formControlName="otp"
+        placeholder="Enter 4-digit OTP"
+        [maxlength]="4"
+        [disabled]="isVerifyingOTP"
+      />
+      <div
+        class="error-message"
+        *ngIf="signUpForm.get('otp')?.invalid && signUpForm.get('otp')?.touched"
+      >
+        <span *ngIf="signUpForm.get('otp')?.errors?.['required']">
+          OTP is required
+        </span>
+        <span *ngIf="signUpForm.get('otp')?.errors?.['pattern']">
+          Please enter a valid 4-digit OTP
+        </span>
+      </div>
+
+      <button
+        type="button"
+        (click)="validateOTP()"
+        [disabled]="signUpForm.get('otp')?.invalid || isVerifyingOTP"
+        class="verify-button"
+      >
+        {{ isVerifyingOTP ? "Verifying OTP..." : "Verify OTP" }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Popup Message -->
+  <div
+    *ngIf="showPopup"
+    class="popup-message"
+    [ngClass]="{
+      success: popupType === 'success',
+      error: popupType === 'error'
+    }"
+  >
+    {{ popupMessage }}
+  </div>
+
+  <div class="sign-in-link">
+    Already have an account? <a routerLink="/sign-in">Sign in</a>
+  </div>
+</div>

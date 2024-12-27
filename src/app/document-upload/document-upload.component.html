@@ -1,0 +1,44 @@
+<div class="document-upload-container">
+  <h2>Document Upload</h2>
+  <form [formGroup]="documentUploadForm" (ngSubmit)="submitDocuments()">
+    <div>
+      <label for="idProofType">ID Proof Type:</label>
+      <select id="idProofType" formControlName="idProofType" required>
+        <option value="">Select ID Proof Type</option>
+        <option value="passport">Passport</option>
+        <option value="drivingLicense">Driving License</option>
+        <option value="nationalId">National ID</option>
+      </select>
+    </div>
+    <div>
+      <label for="idProofFile">ID Proof Document:</label>
+      <input
+        type="file"
+        id="idProofFile"
+        (change)="onFileChange($event, 'idProofFile')"
+        required
+      />
+    </div>
+    <div>
+      <label for="addressProofType">Address Proof Type:</label>
+      <select id="addressProofType" formControlName="addressProofType" required>
+        <option value="">Select Address Proof Type</option>
+        <option value="utilityBill">Utility Bill</option>
+        <option value="bankStatement">Bank Statement</option>
+        <option value="rentalAgreement">Rental Agreement</option>
+      </select>
+    </div>
+    <div>
+      <label for="addressProofFile">Address Proof Document:</label>
+      <input
+        type="file"
+        id="addressProofFile"
+        (change)="onFileChange($event, 'addressProofFile')"
+        required
+      />
+    </div>
+    <button type="submit" [disabled]="documentUploadForm.invalid">
+      Submit
+    </button>
+  </form>
+</div>

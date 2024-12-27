@@ -1,0 +1,11 @@
+<div class="confirmation-container">
+  <h2>Account Created Successfully</h2>
+  <div *ngIf="accountDetails">
+    <p>Customer ID: {{ accountDetails.id }}</p>
+    <p>Account Number: {{ accountDetails.primary_account_id }}</p>
+    <p>Name: {{ accountDetails.first_name }} {{ accountDetails.last_name }}</p>
+    <p>Email: {{ accountDetails.email }}</p>
+  </div>
+  <p>A confirmation SMS has been sent to your registered mobile number.</p>
+  <p>Thank you for choosing ABC Bank!</p>
+</div>

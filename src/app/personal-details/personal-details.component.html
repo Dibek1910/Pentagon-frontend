@@ -1,0 +1,474 @@
+<div class="personal-details-container">
+  <h2>Personal Details</h2>
+  <form [formGroup]="personalDetailsForm" (ngSubmit)="onSubmit()">
+    <div
+      *ngIf="showPopup && popupType === 'error'"
+      class="error-banner"
+      role="alert"
+    >
+      {{ popupMessage }}
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">First Name: *</label>
+        <input
+          type="text"
+          id="firstName"
+          formControlName="firstName"
+          placeholder="Enter first name"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('firstName')?.invalid &&
+            personalDetailsForm.get('firstName')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('firstName')?.errors?.['required']"
+            >First name is required</span
+          >
+          <span
+            *ngIf="personalDetailsForm.get('firstName')?.errors?.['minlength']"
+            >First name must be at least 2 characters</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="middleName">Middle Name:</label>
+        <input
+          type="text"
+          id="middleName"
+          formControlName="middleName"
+          placeholder="Enter middle name"
+          [disabled]="isSaving"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name: *</label>
+        <input
+          type="text"
+          id="lastName"
+          formControlName="lastName"
+          placeholder="Enter last name"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('lastName')?.invalid &&
+            personalDetailsForm.get('lastName')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('lastName')?.errors?.['required']"
+            >Last name is required</span
+          >
+          <span
+            *ngIf="personalDetailsForm.get('lastName')?.errors?.['minlength']"
+            >Last name must be at least 2 characters</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="email">Email: *</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Enter email"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('email')?.invalid &&
+            personalDetailsForm.get('email')?.touched
+          "
+        >
+          <span *ngIf="personalDetailsForm.get('email')?.errors?.['required']"
+            >Email is required</span
+          >
+          <span *ngIf="personalDetailsForm.get('email')?.errors?.['email']"
+            >Please enter a valid email address</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number:</label>
+        <input
+          type="tel"
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          placeholder="Enter phone number"
+          [disabled]="true"
+        />
+        <div class="info-message">Phone number verified during sign up</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="gender">Gender: *</label>
+        <select id="gender" formControlName="gender" [disabled]="isSaving">
+          <option value="">Select gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('gender')?.invalid &&
+            personalDetailsForm.get('gender')?.touched
+          "
+        >
+          <span *ngIf="personalDetailsForm.get('gender')?.errors?.['required']"
+            >Gender is required</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dateOfBirth">Date of Birth: *</label>
+        <input
+          type="date"
+          id="dateOfBirth"
+          formControlName="dateOfBirth"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('dateOfBirth')?.invalid &&
+            personalDetailsForm.get('dateOfBirth')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('dateOfBirth')?.errors?.['required']"
+            >Date of birth is required</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <h3>Current Address</h3>
+    <div class="form-group">
+      <label for="currentAddress">Address: *</label>
+      <textarea
+        id="currentAddress"
+        formControlName="currentAddress"
+        placeholder="Enter current address"
+        [disabled]="isSaving"
+        rows="3"
+      ></textarea>
+      <div
+        class="error-message"
+        *ngIf="
+          personalDetailsForm.get('currentAddress')?.invalid &&
+          personalDetailsForm.get('currentAddress')?.touched
+        "
+      >
+        <span
+          *ngIf="personalDetailsForm.get('currentAddress')?.errors?.['required']"
+          >Current address is required</span
+        >
+        <span
+          *ngIf="personalDetailsForm.get('currentAddress')?.errors?.['minlength']"
+          >Address must be at least 10 characters long</span
+        >
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="currentCity">City: *</label>
+        <input
+          type="text"
+          id="currentCity"
+          formControlName="currentCity"
+          placeholder="Enter city"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('currentCity')?.invalid &&
+            personalDetailsForm.get('currentCity')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('currentCity')?.errors?.['required']"
+            >City is required</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="currentState">State: *</label>
+        <input
+          type="text"
+          id="currentState"
+          formControlName="currentState"
+          placeholder="Enter state"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('currentState')?.invalid &&
+            personalDetailsForm.get('currentState')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('currentState')?.errors?.['required']"
+            >State is required</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="currentPincode">Pincode: *</label>
+        <input
+          type="text"
+          id="currentPincode"
+          formControlName="currentPincode"
+          placeholder="Enter pincode"
+          [maxlength]="6"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('currentPincode')?.invalid &&
+            personalDetailsForm.get('currentPincode')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('currentPincode')?.errors?.['required']"
+            >Pincode is required</span
+          >
+          <span
+            *ngIf="personalDetailsForm.get('currentPincode')?.errors?.['pattern']"
+            >Please enter a valid 6-digit pincode</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group checkbox-group">
+      <input
+        type="checkbox"
+        id="isPermanentSameAsCurrent"
+        formControlName="isPermanentSameAsCurrent"
+      />
+      <label for="isPermanentSameAsCurrent">
+        Permanent address same as current address
+      </label>
+    </div>
+
+    <h3>Permanent Address</h3>
+    <div class="form-group">
+      <label for="permanentAddress">Address: *</label>
+      <textarea
+        id="permanentAddress"
+        formControlName="permanentAddress"
+        placeholder="Enter permanent address"
+        [disabled]="
+          isSaving || personalDetailsForm.get('isPermanentSameAsCurrent')?.value
+        "
+        rows="3"
+      ></textarea>
+      <div
+        class="error-message"
+        *ngIf="
+          personalDetailsForm.get('permanentAddress')?.invalid &&
+          personalDetailsForm.get('permanentAddress')?.touched
+        "
+      >
+        <span
+          *ngIf="personalDetailsForm.get('permanentAddress')?.errors?.['required']"
+          >Permanent address is required</span
+        >
+        <span
+          *ngIf="personalDetailsForm.get('permanentAddress')?.errors?.['minlength']"
+          >Address must be at least 10 characters long</span
+        >
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="permanentCity">City: *</label>
+        <input
+          type="text"
+          id="permanentCity"
+          formControlName="permanentCity"
+          placeholder="Enter city"
+          [disabled]="
+            isSaving ||
+            personalDetailsForm.get('isPermanentSameAsCurrent')?.value
+          "
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('permanentCity')?.invalid &&
+            personalDetailsForm.get('permanentCity')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('permanentCity')?.errors?.['required']"
+            >City is required</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="permanentState">State: *</label>
+        <input
+          type="text"
+          id="permanentState"
+          formControlName="permanentState"
+          placeholder="Enter state"
+          [disabled]="
+            isSaving ||
+            personalDetailsForm.get('isPermanentSameAsCurrent')?.value
+          "
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('permanentState')?.invalid &&
+            personalDetailsForm.get('permanentState')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('permanentState')?.errors?.['required']"
+            >State is required</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="permanentPincode">Pincode: *</label>
+        <input
+          type="text"
+          id="permanentPincode"
+          formControlName="permanentPincode"
+          placeholder="Enter pincode"
+          [maxlength]="6"
+          [disabled]="
+            isSaving ||
+            personalDetailsForm.get('isPermanentSameAsCurrent')?.value
+          "
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('permanentPincode')?.invalid &&
+            personalDetailsForm.get('permanentPincode')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('permanentPincode')?.errors?.['required']"
+            >Pincode is required</span
+          >
+          <span
+            *ngIf="personalDetailsForm.get('permanentPincode')?.errors?.['pattern']"
+            >Please enter a valid 6-digit pincode</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <h3>Set Password</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="password">Password: *</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          placeholder="Enter password"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('password')?.invalid &&
+            personalDetailsForm.get('password')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('password')?.errors?.['required']"
+            >Password is required</span
+          >
+          <span
+            *ngIf="personalDetailsForm.get('password')?.errors?.['minlength']"
+            >Password must be at least 8 characters long</span
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password: *</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          placeholder="Confirm password"
+          [disabled]="isSaving"
+        />
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.get('confirmPassword')?.invalid &&
+            personalDetailsForm.get('confirmPassword')?.touched
+          "
+        >
+          <span
+            *ngIf="personalDetailsForm.get('confirmPassword')?.errors?.['required']"
+            >Please confirm your password</span
+          >
+        </div>
+        <div
+          class="error-message"
+          *ngIf="
+            personalDetailsForm.hasError('mismatch') &&
+            personalDetailsForm.get('confirmPassword')?.touched
+          "
+        >
+          Passwords do not match
+        </div>
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="personalDetailsForm.invalid || isSaving"
+      class="primary-button"
+    >
+      {{ isSaving ? "Saving..." : "Save & Continue" }}
+    </button>
+  </form>
+
+  <!-- Popup Message -->
+  <div
+    *ngIf="showPopup"
+    class="popup-message"
+    [ngClass]="{
+      success: popupType === 'success',
+      error: popupType === 'error'
+    }"
+  >
+    {{ popupMessage }}
+  </div>
+</div>
