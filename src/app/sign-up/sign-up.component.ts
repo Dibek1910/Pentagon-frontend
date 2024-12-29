@@ -44,11 +44,8 @@ export class SignUpComponent {
       this.isGeneratingOTP = true;
       const mobileNumber = this.signUpForm.get('mobileNumber')?.value;
 
-      console.log('Attempting to generate OTP for:', mobileNumber);
-
       this.authService.generateOTP(mobileNumber).subscribe({
         next: (response) => {
-          console.log('OTP Generation Response:', response);
           if (response.success) {
             this.otpSent = true;
             this.showPopupMessage('OTP sent successfully!', 'success');
@@ -61,11 +58,8 @@ export class SignUpComponent {
           this.isGeneratingOTP = false;
         },
         error: (error) => {
-          console.error('OTP Generation Error:', error);
           this.showPopupMessage(
-            typeof error === 'string'
-              ? error
-              : 'Failed to send OTP. Please try again.',
+            error.message || 'Failed to send OTP. Please try again.',
             'error'
           );
           this.isGeneratingOTP = false;
@@ -85,15 +79,10 @@ export class SignUpComponent {
           if (response.success) {
             if (response.token) {
               localStorage.setItem('auth_token', response.token);
-              // Store the verified mobile number
               localStorage.setItem('verified_mobile', mobileNumber);
             }
             this.showPopupMessage('OTP verified successfully!', 'success');
-            console.log('Navigating to personal details page...');
-            this.router.navigate(['/personal-details']).then(
-              (navigated) => console.log('Navigation result:', navigated),
-              (error) => console.error('Navigation error:', error)
-            );
+            this.router.navigate(['/personal-details']);
           } else {
             this.showPopupMessage(
               response.message || 'OTP validation failed',
@@ -103,11 +92,8 @@ export class SignUpComponent {
           this.isVerifyingOTP = false;
         },
         error: (error) => {
-          console.error('OTP validation error:', error);
           this.showPopupMessage(
-            typeof error === 'string'
-              ? error
-              : 'Invalid OTP. Please try again.',
+            error.message || 'Invalid OTP. Please try again.',
             'error'
           );
           this.isVerifyingOTP = false;

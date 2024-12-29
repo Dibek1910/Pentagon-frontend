@@ -18,6 +18,8 @@ import { DocumentService } from '../document.service';
 })
 export class DocumentUploadComponent {
   documentUploadForm: FormGroup;
+  isUploading = false;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
@@ -41,32 +43,75 @@ export class DocumentUploadComponent {
 
   submitDocuments() {
     if (this.documentUploadForm.valid) {
-      const formData = new FormData();
-      formData.append(
-        'idProofType',
+      this.isUploading = true;
+      this.errorMessage = '';
+      const customerId = localStorage.getItem('customer_id');
+
+      if (!customerId) {
+        this.errorMessage = 'Customer ID not found. Please sign up again.';
+        this.isUploading = false;
+        return;
+      }
+
+      const idProofFormData = new FormData();
+      idProofFormData.append('customer_id', customerId);
+      idProofFormData.append(
+        'document_type',
         this.documentUploadForm.get('idProofType')?.value
       );
-      formData.append(
-        'idProofFile',
+      idProofFormData.append(
+        'file',
         this.documentUploadForm.get('idProofFile')?.value
       );
-      formData.append(
-        'addressProofType',
-        this.documentUploadForm.get('addressProofType')?.value
-      );
-      formData.append(
-        'addressProofFile',
-        this.documentUploadForm.get('addressProofFile')?.value
-      );
 
-      this.documentService.uploadDocuments(formData).subscribe(
-        () => {
-          this.router.navigate(['/confirmation']);
-        },
-        (error) => {
-          console.error('Error uploading documents:', error);
-        }
-      );
+      this.documentService
+        .uploadDocument(
+          parseInt(customerId),
+          this.documentUploadForm.get('idProofType')?.value,
+          this.documentUploadForm.get('idProofFile')?.value
+        )
+        .subscribe(
+          (response) => {
+            console.log('ID Proof uploaded successfully:', response);
+
+            // Upload address proof
+            const addressProofFormData = new FormData();
+            addressProofFormData.append('customer_id', customerId);
+            addressProofFormData.append(
+              'document_type',
+              this.documentUploadForm.get('addressProofType')?.value
+            );
+            addressProofFormData.append(
+              'file',
+              this.documentUploadForm.get('addressProofFile')?.value
+            );
+
+            this.documentService
+              .uploadDocument(
+                parseInt(customerId),
+                this.documentUploadForm.get('addressProofType')?.value,
+                this.documentUploadForm.get('addressProofFile')?.value
+              )
+              .subscribe(
+                (response) => {
+                  console.log('Address Proof uploaded successfully:', response);
+                  this.isUploading = false;
+                  this.router.navigate(['/confirmation']);
+                },
+                (error) => {
+                  console.error('Error uploading address proof:', error);
+                  this.errorMessage =
+                    'Failed to upload address proof. Please try again.';
+                  this.isUploading = false;
+                }
+              );
+          },
+          (error) => {
+            console.error('Error uploading ID proof:', error);
+            this.errorMessage = 'Failed to upload ID proof. Please try again.';
+            this.isUploading = false;
+          }
+        );
     }
   }
 }

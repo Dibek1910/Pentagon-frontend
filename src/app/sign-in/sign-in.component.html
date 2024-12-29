@@ -2,23 +2,22 @@
   <h2>Sign In</h2>
   <form [formGroup]="signInForm" (ngSubmit)="signIn()">
     <div class="form-group">
-      <label for="accountId">Account ID:</label>
+      <label for="userId">User ID:</label>
       <input
         type="text"
-        id="accountId"
-        formControlName="accountId"
-        placeholder="Enter your account ID"
+        id="userId"
+        formControlName="userId"
+        placeholder="Enter your user ID"
         [disabled]="isSigningIn"
       />
       <div
         class="error-message"
         *ngIf="
-          signInForm.get('accountId')?.invalid &&
-          signInForm.get('accountId')?.touched
+          signInForm.get('userId')?.invalid && signInForm.get('userId')?.touched
         "
       >
-        <span *ngIf="signInForm.get('accountId')?.errors?.['required']">
-          Account ID is required
+        <span *ngIf="signInForm.get('userId')?.errors?.['required']">
+          User ID is required
         </span>
       </div>
     </div>

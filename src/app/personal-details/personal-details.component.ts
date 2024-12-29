@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -19,17 +19,23 @@ import * as bcrypt from 'bcryptjs';
 })
 export class PersonalDetailsComponent implements OnInit {
   personalDetailsForm: FormGroup;
-  isSaving = false;
+  isSubmitting = false;
+  errorMessage = '';
   showPopup = false;
   popupMessage = '';
   popupType: 'success' | 'error' = 'success';
+  isBrowser: boolean;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    @Inject(PLATFORM_ID) platformId: Object
   ) {
-    const verifiedMobile = localStorage.getItem('verified_mobile') || '';
+    this.isBrowser = isPlatformBrowser(platformId);
+    const verifiedMobile = this.isBrowser
+      ? localStorage.getItem('verified_mobile') || ''
+      : '';
 
     this.personalDetailsForm = this.fb.group(
       {
@@ -71,11 +77,13 @@ export class PersonalDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    const token = localStorage.getItem('auth_token');
-    const verifiedMobile = localStorage.getItem('verified_mobile');
+    if (this.isBrowser) {
+      const token = localStorage.getItem('auth_token');
+      const verifiedMobile = localStorage.getItem('verified_mobile');
 
-    if (!token || !verifiedMobile) {
-      this.router.navigate(['/sign-up']);
+      if (!token || !verifiedMobile) {
+        this.router.navigate(['/sign-up']);
+      }
     }
   }
 
@@ -101,9 +109,24 @@ export class PersonalDetailsComponent implements OnInit {
     });
   }
 
+  private formatDate(date: string): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  }
+
+  private showPopupMessage(message: string, type: 'success' | 'error'): void {
+    this.popupMessage = message;
+    this.popupType = type;
+    this.showPopup = true;
+    setTimeout(() => {
+      this.showPopup = false;
+    }, 3000);
+  }
+
   async onSubmit() {
     if (this.personalDetailsForm.valid) {
-      this.isSaving = true;
+      this.isSubmitting = true;
+      this.errorMessage = '';
 
       try {
         const hashedPassword = await bcrypt.hash(
@@ -141,41 +164,67 @@ export class PersonalDetailsComponent implements OnInit {
           password: hashedPassword,
         };
 
-        const response = await this.customerService
-          .createCustomer(formData)
-          .toPromise();
+        let retryCount = 0;
+        const maxRetries = 3;
+        let lastError: any;
 
-        if (response) {
-          localStorage.setItem('customer_id', response.id.toString());
-          this.showPopupMessage(
-            'Personal details saved successfully!',
-            'success'
-          );
-          this.router.navigate(['/document-upload']);
+        while (retryCount < maxRetries) {
+          try {
+            const response = await this.customerService
+              .createCustomer(formData)
+              .toPromise();
+
+            if (response) {
+              if (this.isBrowser) {
+                localStorage.setItem('customer_id', response.id.toString());
+              }
+              this.showPopupMessage(
+                'Personal details saved successfully!',
+                'success'
+              );
+              this.router.navigate(['/document-upload']);
+              return;
+            }
+          } catch (error: any) {
+            lastError = error;
+            if (error.message.includes('Database connection error')) {
+              // Wait for 2 seconds before retrying
+              await new Promise((resolve) => setTimeout(resolve, 2000));
+              retryCount++;
+              continue;
+            }
+            // If it's not a database connection error, throw immediately
+            throw error;
+          }
+        }
+
+        // If we've exhausted retries, throw the last error
+        if (lastError) {
+          throw lastError;
         }
       } catch (error: any) {
         console.error('Error saving personal details:', error);
 
-        // Handle SQLAlchemy specific errors
-        if (error.message?.includes('AmbiguousForeignKeysError')) {
+        if (error.message.includes('Database connection error')) {
           this.showPopupMessage(
-            'A technical error occurred. Our team has been notified.',
+            'Unable to connect to the server. Please try again in a few moments.',
             'error'
           );
         } else if (error.errors) {
-          const errorMessage = Array.isArray(error.errors)
-            ? error.errors[0].msg
-            : 'Please check your input and try again';
-          this.showPopupMessage(errorMessage, 'error');
+          const errorMessages = Array.isArray(error.errors)
+            ? error.errors.map((err: any) => err.msg).join('. ')
+            : 'Validation error occurred';
+          this.showPopupMessage(errorMessages, 'error');
+        } else if (error.message) {
+          this.showPopupMessage(error.message, 'error');
         } else {
           this.showPopupMessage(
-            error.message ||
-              'Failed to save personal details. Please try again.',
+            'An unexpected error occurred. Please try again.',
             'error'
           );
         }
       } finally {
-        this.isSaving = false;
+        this.isSubmitting = false;
       }
     } else {
       this.showPopupMessage(
@@ -189,27 +238,5 @@ export class PersonalDetailsComponent implements OnInit {
         }
       });
     }
-  }
-
-  private formatDate(date: string): string {
-    const d = new Date(date);
-    return d.toISOString().split('T')[0];
-  }
-
-  private showPopupMessage(message: string, type: 'success' | 'error'): void {
-    this.popupMessage = message;
-    this.popupType = type;
-    this.showPopup = true;
-    setTimeout(() => {
-      this.showPopup = false;
-    }, 3000);
-  }
-
-  private handleTechnicalError(error: any): void {
-    console.error('Technical error:', error);
-    this.showPopupMessage(
-      'A technical error occurred. Please try again later.',
-      'error'
-    );
   }
 }

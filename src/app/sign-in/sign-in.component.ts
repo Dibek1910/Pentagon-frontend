@@ -29,7 +29,7 @@ export class SignInComponent {
     private router: Router
   ) {
     this.signInForm = this.fb.group({
-      accountId: ['', [Validators.required]],
+      userId: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
@@ -37,10 +37,10 @@ export class SignInComponent {
   signIn(): void {
     if (this.signInForm.valid) {
       this.isSigningIn = true;
-      const accountId = this.signInForm.get('accountId')?.value;
+      const userId = this.signInForm.get('userId')?.value;
       const password = this.signInForm.get('password')?.value;
 
-      this.authService.signIn(accountId, password).subscribe({
+      this.authService.signIn(userId, password).subscribe({
         next: (response) => {
           if (response.success) {
             if (response.token) {

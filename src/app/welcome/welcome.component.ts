@@ -13,6 +13,6 @@ export class WelcomeComponent {
   constructor(private router: Router) {}
 
   getStarted() {
-    this.router.navigate(['/sign-in']);
+    this.router.navigate(['/sign-up']);
   }
 }

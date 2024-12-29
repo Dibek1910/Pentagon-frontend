@@ -6,6 +6,11 @@
     <p>Name: {{ accountDetails.first_name }} {{ accountDetails.last_name }}</p>
     <p>Email: {{ accountDetails.email }}</p>
   </div>
-  <p>A confirmation SMS has been sent to your registered mobile number.</p>
+  <p *ngIf="!errorMessage">
+    A confirmation SMS has been sent to your registered mobile number.
+  </p>
   <p>Thank you for choosing ABC Bank!</p>
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
 </div>
