@@ -48,7 +48,7 @@ export interface CustomerCreate {
   providedIn: 'root',
 })
 export class CustomerService {
-  private apiUrl = 'https://pentagon-backend-v4cw.onrender.com/customers/';
+  private apiUrl = 'http://localhost:8000/customers';
 
   constructor(private http: HttpClient) {}
 
@@ -59,7 +59,7 @@ export class CustomerService {
   }
 
   getAccountDetails(customerId: number): Observable<CustomerResponse> {
-    const url = `${this.apiUrl.slice(0, -1)}/${customerId}`;
+    const url = `${this.apiUrl}/${customerId}`;
     return this.http
       .get<CustomerResponse>(url)
       .pipe(catchError(this.handleError));

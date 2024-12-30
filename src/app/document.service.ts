@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class DocumentService {
-  private apiUrl = 'https://pentagon-backend-v4cw.onrender.com/documents';
+  private apiUrl = 'http://localhost:8000/documents';
 
   constructor(private http: HttpClient) {}
 
