@@ -187,13 +187,13 @@ export class PersonalDetailsComponent implements OnInit {
             }
           } catch (error: any) {
             lastError = error;
-            if (error.message.includes('Database connection error')) {
+            if (error.status === 0) {
               // Wait for 2 seconds before retrying
               await new Promise((resolve) => setTimeout(resolve, 2000));
               retryCount++;
               continue;
             }
-            // If it's not a database connection error, throw immediately
+            // If it's not a connection error, throw immediately
             throw error;
           }
         }
@@ -205,18 +205,22 @@ export class PersonalDetailsComponent implements OnInit {
       } catch (error: any) {
         console.error('Error saving personal details:', error);
 
-        if (error.message.includes('Database connection error')) {
+        if (error.status === 0) {
           this.showPopupMessage(
-            'Unable to connect to the server. Please try again in a few moments.',
+            'Unable to connect to the server. Please check your internet connection and try again.',
             'error'
           );
-        } else if (error.errors) {
-          const errorMessages = Array.isArray(error.errors)
-            ? error.errors.map((err: any) => err.msg).join('. ')
-            : 'Validation error occurred';
-          this.showPopupMessage(errorMessages, 'error');
-        } else if (error.message) {
-          this.showPopupMessage(error.message, 'error');
+        } else if (error.status === 400) {
+          this.showPopupMessage(
+            error.error.detail ||
+              'Invalid input. Please check your details and try again.',
+            'error'
+          );
+        } else if (error.status === 500) {
+          this.showPopupMessage(
+            'An unexpected error occurred on the server. Please try again later.',
+            'error'
+          );
         } else {
           this.showPopupMessage(
             'An unexpected error occurred. Please try again.',

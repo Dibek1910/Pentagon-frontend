@@ -94,6 +94,17 @@
             ],
             "scripts": []
           }
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "pentagon:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "pentagon:serve:production"
+            }
+          }
         }
       }
     }
