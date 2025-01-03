@@ -1,0 +1,23 @@
+:host {
+  display: block;
+}
+
+.bg-primary {
+  background-color: #1a73e8;
+}
+
+.hover\:bg-primary-dark:hover {
+  background-color: #1557b0;
+}
+
+.text-primary {
+  color: #1a73e8;
+}
+
+.focus\:ring-primary:focus {
+  --tw-ring-color: #1a73e8;
+}
+
+.border-primary {
+  border-color: #1a73e8;
+}

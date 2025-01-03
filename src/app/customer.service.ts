@@ -8,19 +8,8 @@ export interface CustomerResponse {
   first_name: string;
   middle_name?: string;
   last_name: string;
-  phone_number: string;
   email: string;
-  gender: string;
-  dob: string;
-  current_address: string;
-  current_city: string;
-  current_state: string;
-  current_pincode: string;
-  is_permanent_same_as_current: boolean;
-  permanent_address: string;
-  permanent_city: string;
-  permanent_state: string;
-  permanent_pincode: string;
+  phone_number: string;
   primary_account_id: number;
 }
 
@@ -45,23 +34,30 @@ export interface CustomerCreate {
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class CustomerService {
-  private apiUrl = 'http://localhost:8000/customers';
+  private apiUrl = 'http://localhost:8000';
 
   constructor(private http: HttpClient) {}
 
   createCustomer(customerData: CustomerCreate): Observable<CustomerResponse> {
-    return this.http
-      .post<CustomerResponse>(this.apiUrl, customerData)
+    return this.http.post<CustomerResponse>(`${this.apiUrl}/customers`, customerData)
       .pipe(catchError(this.handleError));
   }
 
   getAccountDetails(customerId: number): Observable<CustomerResponse> {
-    const url = `${this.apiUrl}/${customerId}`;
-    return this.http
-      .get<CustomerResponse>(url)
+    return this.http.get<CustomerResponse>(`${this.apiUrl}/customers/${customerId}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  completeKycVerification(customerId: number): Observable<CustomerResponse> {
+    return this.http.post<CustomerResponse>(`${this.apiUrl}/customers/${customerId}/complete-kyc`, {})
+      .pipe(catchError(this.handleError));
+  }
+
+  getAccountBalance(customerId: number): Observable<number> {
+    return this.http.get<number>(`${this.apiUrl}/customers/${customerId}/balance`)
       .pipe(catchError(this.handleError));
   }
 
@@ -74,17 +70,11 @@ export class CustomerService {
     } else {
       // Server-side error
       if (error.status === 0) {
-        errorMessage =
-          'Server is currently unavailable. Please try again later.';
-      } else if (error.error?.detail?.includes('connection to server')) {
-        errorMessage =
-          'Database connection error. Please try again in a few moments.';
-      } else if (error.status === 307) {
-        errorMessage = 'Server configuration error. Please try again.';
+        errorMessage = 'Server is currently unavailable. Please try again later.';
+      } else if (error.error?.detail) {
+        errorMessage = error.error.detail;
       } else {
-        errorMessage = `Error Code: ${error.status}\nMessage: ${
-          error.error?.detail || error.message
-        }`;
+        errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
       }
     }
 
@@ -92,3 +82,4 @@ export class CustomerService {
     return throwError(() => new Error(errorMessage));
   }
 }
+

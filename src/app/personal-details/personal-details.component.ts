@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CustomerService } from '../customer.service';
+import { EmailService } from '../email.service';
 import * as bcrypt from 'bcryptjs';
 
 @Component({
@@ -30,6 +31,7 @@ export class PersonalDetailsComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private customerService: CustomerService,
+    private emailService: EmailService,
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -164,69 +166,34 @@ export class PersonalDetailsComponent implements OnInit {
           password: hashedPassword,
         };
 
-        let retryCount = 0;
-        const maxRetries = 3;
-        let lastError: any;
+        const response = await this.customerService
+          .createCustomer(formData)
+          .toPromise();
 
-        while (retryCount < maxRetries) {
-          try {
-            const response = await this.customerService
-              .createCustomer(formData)
-              .toPromise();
-
-            if (response) {
-              if (this.isBrowser) {
-                localStorage.setItem('customer_id', response.id.toString());
-              }
-              this.showPopupMessage(
-                'Personal details saved successfully!',
-                'success'
-              );
-              this.router.navigate(['/document-upload']);
-              return;
-            }
-          } catch (error: any) {
-            lastError = error;
-            if (error.status === 0) {
-              // Wait for 2 seconds before retrying
-              await new Promise((resolve) => setTimeout(resolve, 2000));
-              retryCount++;
-              continue;
-            }
-            // If it's not a connection error, throw immediately
-            throw error;
-          }
-        }
-
-        // If we've exhausted retries, throw the last error
-        if (lastError) {
-          throw lastError;
+        if (response) {
+          localStorage.setItem('customer_id', response.id.toString());
+          this.emailService
+            .sendPersonalDetailsSubmissionEmail(response.email)
+            .subscribe(
+              () => console.log('Personal details submission email sent'),
+              (error) =>
+                console.error(
+                  'Error sending personal details submission email:',
+                  error
+                )
+            );
+          this.showPopupMessage(
+            'Personal details saved successfully!',
+            'success'
+          );
+          this.router.navigate(['/document-upload']);
         }
       } catch (error: any) {
         console.error('Error saving personal details:', error);
-
-        if (error.status === 0) {
-          this.showPopupMessage(
-            'Unable to connect to the server. Please check your internet connection and try again.',
-            'error'
-          );
-        } else if (error.status === 400) {
-          this.showPopupMessage(
-            error.error.detail ||
-              'Invalid input. Please check your details and try again.',
-            'error'
-          );
-        } else if (error.status === 500) {
-          this.showPopupMessage(
-            'An unexpected error occurred on the server. Please try again later.',
-            'error'
-          );
-        } else {
-          this.showPopupMessage(
-            'An unexpected error occurred. Please try again.',
-            'error'
-          );
-        }
+        this.showPopupMessage(
+          'An unexpected error occurred. Please try again.',
+          'error'
+        );
       } finally {
         this.isSubmitting = false;
       }

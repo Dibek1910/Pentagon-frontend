@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DocumentService } from '../document.service';
+import { EmailService } from '../email.service';
 
 @Component({
   selector: 'app-document-upload',
@@ -24,7 +25,8 @@ export class DocumentUploadComponent {
   constructor(
     private fb: FormBuilder,
     private documentService: DocumentService,
-    private router: Router
+    private router: Router,
+    private emailService: EmailService
   ) {
     this.documentUploadForm = this.fb.group({
       idProofType: ['', Validators.required],
@@ -96,7 +98,17 @@ export class DocumentUploadComponent {
                 (response) => {
                   console.log('Address Proof uploaded successfully:', response);
                   this.isUploading = false;
-                  this.router.navigate(['/confirmation']);
+                  this.emailService
+                    .sendDocumentSubmissionEmail(customerId)
+                    .subscribe(
+                      () => console.log('Document submission email sent'),
+                      (error) =>
+                        console.error(
+                          'Error sending document submission email:',
+                          error
+                        )
+                    );
+                  this.router.navigate(['/kyc-verification']);
                 },
                 (error) => {
                   console.error('Error uploading address proof:', error);

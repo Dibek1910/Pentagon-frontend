@@ -1,16 +1,76 @@
-<div class="confirmation-container">
-  <h2>Account Created Successfully</h2>
-  <div *ngIf="accountDetails">
-    <p>Customer ID: {{ accountDetails.id }}</p>
-    <p>Account Number: {{ accountDetails.primary_account_id }}</p>
-    <p>Name: {{ accountDetails.first_name }} {{ accountDetails.last_name }}</p>
-    <p>Email: {{ accountDetails.email }}</p>
-  </div>
-  <p *ngIf="!errorMessage">
-    A confirmation SMS has been sent to your registered mobile number.
-  </p>
-  <p>Thank you for choosing ABC Bank!</p>
-  <div *ngIf="errorMessage" class="error-message">
-    {{ errorMessage }}
+<div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-lg mx-auto bg-white rounded-lg shadow-lg p-8">
+    <div class="text-center mb-8">
+      <div
+        class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4"
+      >
+        <svg
+          class="h-6 w-6 text-green-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M5 13l4 4L19 7"
+          ></path>
+        </svg>
+      </div>
+      <h2 class="text-3xl font-bold text-gray-900">
+        Account Created Successfully!
+      </h2>
+      <p class="mt-2 text-sm text-gray-600">
+        Your account has been verified and created
+      </p>
+    </div>
+
+    <div class="mt-8 space-y-6" *ngIf="accountDetails">
+      <div class="bg-gray-50 px-4 py-5 rounded-lg">
+        <div class="grid grid-cols-1 gap-4">
+          <div class="flex justify-between">
+            <span class="text-sm font-medium text-gray-500">Customer ID</span>
+            <span class="text-sm text-gray-900">{{
+              maskId(accountDetails.id.toString())
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm font-medium text-gray-500"
+              >Account Number</span
+            >
+            <span class="text-sm text-gray-900">{{
+              maskId(accountDetails.primary_account_id.toString())
+            }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm font-medium text-gray-500">Name</span>
+            <span class="text-sm text-gray-900"
+              >{{ accountDetails.first_name }}
+              {{ accountDetails.last_name }}</span
+            >
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm font-medium text-gray-500">Email</span>
+            <span class="text-sm text-gray-900">{{
+              accountDetails.email
+            }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button
+          (click)="goToDashboard()"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="mt-4 text-center text-red-600">
+      {{ errorMessage }}
+    </div>
   </div>
 </div>

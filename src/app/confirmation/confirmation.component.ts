@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { CustomerService, CustomerResponse } from '../customer.service';
 
 @Component({
@@ -13,7 +14,10 @@ export class ConfirmationComponent implements OnInit {
   accountDetails: CustomerResponse | null = null;
   errorMessage = '';
 
-  constructor(private customerService: CustomerService) {}
+  constructor(
+    private customerService: CustomerService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     const customerId = localStorage.getItem('customer_id');
@@ -33,5 +37,13 @@ export class ConfirmationComponent implements OnInit {
     } else {
       this.errorMessage = 'Customer ID not found. Please sign up again.';
     }
+  }
+
+  maskId(id: string): string {
+    return '*'.repeat(id.length - 3) + id.slice(-3);
+  }
+
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
   }
 }
